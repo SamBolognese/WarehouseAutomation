@@ -1,0 +1,85 @@
+﻿@page "/"
+@using WarehouseAutomation.Data;
+@using WarehouseAutomation.Data.Interfaces;
+
+@inject IProductRepository ProductRepository
+@inject ICustomerRepository CustomerRepository
+@inject IOrderRepository OrderRepository
+
+<div class="container-fluid">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Customer Id</th>
+                <th>Customer</th>
+                <th>Delivery address</th>
+                <th>Payment status</th>
+                <th>Dispatch status</th>
+                <th>Order date</th>
+                <th>Products</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in OrderRepository.GetAll())
+            {
+                <tr @onclick="(() => SetOrderForUpdates(order))">
+                    <td>@order.Id</td>
+                    <td>@order.CustomerId</td>
+                    <td>@order.Customer</td>
+                    <td>@order.DeliveryAddress</td>
+                    <td>@order.PaymentCompleted</td>
+                    <td>@order.Dispatched</td>
+                    <td>@order.OrderDate.</td>
+                    <td>
+                    </td>
+                    <td><button class="btn-danger" @onclick="(() => DeleteOrder(order))">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+
+    </div>
+</EditForm>
+
+<EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder(updatedOrder))">
+
+</EditForm>
+
+
+@code
+{
+    Order newOrder = new Order();
+    private void AddOrder(Order order)
+    {
+        OrderRepository.Add(order);
+        OrderRepository.Save();
+    }
+
+    Order updatedOrder = new Order();
+    private void SetOrderForUpdates(Order selected)
+    {
+        updatedOrder = selected;
+    }
+
+    private void UpdateOrder(Order order)
+    {
+        OrderRepository.Update(order);
+        OrderRepository.Save();
+    }
+
+    private void DeleteOrder(Order order)
+    {
+        OrderRepository.Remove(order);
+        OrderRepository.Save();
+    }
+}
+
+
+
