@@ -7,7 +7,7 @@ namespace WarehouseAutomation.Data.Interfaces
 {
     interface IProductRepository : IRepository<Product>
     {
-        IEnumerable<Product> GetOutOfStock();
-        DateTime GetRestockingDate();
+        Task<IEnumerable<Product>> GetOutOfStockAsync();
+        Task<DateTime> GetRestockingDateAsync(Product product);
     }
 }

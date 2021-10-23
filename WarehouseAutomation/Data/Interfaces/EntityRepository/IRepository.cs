@@ -7,10 +7,9 @@ namespace WarehouseAutomation.Data.Interfaces
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        void Add(TEntity entity);
-        void Remove(TEntity entity);
-        void Update(TEntity entity);
-        void Save();
-        IEnumerable<TEntity> GetAll();
+        Task<TEntity> AddAsync(TEntity entity);
+        Task<TEntity> RemoveAsync(TEntity entity);
+        Task<TEntity> UpdateAsync(TEntity entity);
+        Task<IEnumerable<TEntity>> GetAllAsync();
     }
 }

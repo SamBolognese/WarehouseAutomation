@@ -1,0 +1,145 @@
+﻿@page "/Products"
+@using WarehouseAutomation.Data;
+@using WarehouseAutomation.Data.Interfaces;
+
+@inject IProductRepository ProductRepository
+@inject ICustomerRepository CustomerRepository
+@inject IOrderRepository OrderRepository
+
+<h2>Product stock</h2>
+<div class="container-fluid">
+
+    <h4>All products:</h4>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Remove product</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in allProducts)
+                {
+                    <tr @onclick="(() => SetProductForUpdates(product))">
+                        <td>@product.Id</td>
+                        <td>@product.Name</td>
+                        <td>@product.Description</td>
+                        <td>@product.Price</td>
+                        <td>@product.Stock</td>
+                        <td><button class="btn btn-danger" @onclick="(() => DeleteProduct(product))">Remove product</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h4>Products out of stock:</h4>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Restocking date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in outOfStockProducts)
+                {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price</td>
+                    <td>@product.Stock</td>
+                    <td>@product.RestockingDate</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <EditForm Model="@newProduct" OnValidSubmit="(() => AddProduct(newProduct))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="name">Product name</label>
+            <input @bind-value="@newProduct.Name" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="description">Product description</label>
+            <input @bind-value="@newProduct.Description" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="price">Product price</label>
+            <input @bind-value="@newProduct.Price" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="stock">Product stock</label>
+            <input @bind-value="@newProduct.Stock" type="text" />
+        </div>
+        <button class="btn btn-info" type="submit">Add product</button>
+    </EditForm>
+
+    <EditForm Model="@updatedProduct" OnValidSubmit="(() => UpdateProduct(updatedProduct))">
+        <div class="form-group">
+            <label for="name">Product name</label>
+            <input @bind-value="@updatedProduct.Name" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="description">Product description</label>
+            <input @bind-value="@updatedProduct.Description" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="price">Product price</label>
+            <input @bind-value="@updatedProduct.Price" type="text" />
+        </div>
+        <button class="btn btn-info" type="submit">Update product</button>
+    </EditForm>
+</div>
+
+
+@code 
+{
+    List<Product> allProducts;
+    List<Product> outOfStockProducts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allProducts = await ProductRepository.GetAllAsync() as List<Product>;
+        outOfStockProducts = await ProductRepository.GetOutOfStockAsync() as List<Product>;
+    }
+
+    Product newProduct = new Product();
+    Product updatedProduct = new Product();
+
+
+    private void AddProduct(Product product)
+    {
+        ProductRepository.AddAsync(product);
+        newProduct = new Product();
+    }
+
+    private void SetProductForUpdates(Product selected)
+    {
+        updatedProduct = selected;
+    }
+
+    private void UpdateProduct(Product product)
+    {
+        ProductRepository.UpdateAsync(product);
+    }
+
+    private void DeleteProduct(Product product)
+    {
+        ProductRepository.RemoveAsync(product);
+    }
+}
