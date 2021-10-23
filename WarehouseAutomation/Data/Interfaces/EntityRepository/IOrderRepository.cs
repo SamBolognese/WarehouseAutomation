@@ -7,7 +7,7 @@ namespace WarehouseAutomation.Data.Interfaces
 {
     interface IOrderRepository : IRepository<Order>
     {
-        IEnumerable<Order> GetDispatchedOrders();
-        IEnumerable<Order> GetPendingOrders();
+        Task<IEnumerable<Order>> GetDispatchedOrdersAsync();
+        Task<IEnumerable<Order>> GetPendingOrdersAsync();
     }
 }

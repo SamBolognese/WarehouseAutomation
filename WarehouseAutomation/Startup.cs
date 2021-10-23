@@ -39,6 +39,7 @@ namespace WarehouseAutomation
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderLineRepository, OrderLineRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

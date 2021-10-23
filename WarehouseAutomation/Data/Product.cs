@@ -14,6 +14,7 @@ namespace WarehouseAutomation.Data
         private double _price;
         private int _stock;
         private DateTime _restockingDate;
+
         [Required]
         [Range(0, 9999)] //Id får inte vara negativt
         public int Id

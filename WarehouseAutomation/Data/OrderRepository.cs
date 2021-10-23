@@ -9,52 +9,45 @@ namespace WarehouseAutomation.Data
 {
     public class OrderRepository : IOrderRepository
     {
-        private WarehouseDBContext context;
-        private DbSet<Order> dbSet;
+        private readonly WarehouseDBContext context;
 
         public OrderRepository(WarehouseDBContext context)
         {
             this.context = context;
-            dbSet = context.Orders;
         }
-        public void Add(Order entity)
+        public async Task<Order> AddAsync(Order entity)
         {
-            dbSet.Add(entity);
-        }
-
-        public IEnumerable<Order> GetAll()
-        {
-            /*
-            IEnumerable<Order> query = from order in context.Orders
-                                       join orderLine in context.OrderLines
-                                       on order.Id equals orderLine.OrderId
-            */
-            return context.Orders.ToList();
+            context.Orders.Add(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public IEnumerable<Order> GetDispatchedOrders()
+        public async Task<IEnumerable<Order>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await context.Orders.ToListAsync();
         }
 
-        public IEnumerable<Order> GetPendingOrders()
+        public async Task<IEnumerable<Order>> GetDispatchedOrdersAsync()
         {
-            throw new NotImplementedException();
+            return await context.Orders.Where(o => o.Dispatched == true).ToListAsync();
         }
 
-        public void Remove(Order entity)
+        public async Task<IEnumerable<Order>> GetPendingOrdersAsync()
         {
-            dbSet.Remove(entity);
+            return await context.Orders.Where(o => o.Dispatched == false).ToListAsync();
         }
 
-        public void Save()
+        public async Task<Order> RemoveAsync(Order entity)
         {
-            throw new NotImplementedException();
+            context.Orders.Remove(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public void Update(Order entity)
+        public async Task<Order> UpdateAsync(Order entity)
         {
-            throw new NotImplementedException();
+            await context.SaveChangesAsync();
+            return entity;
         }
     }
 }

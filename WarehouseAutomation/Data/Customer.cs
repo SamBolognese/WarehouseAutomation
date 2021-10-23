@@ -11,10 +11,10 @@ namespace WarehouseAutomation.Data
         private string _name;
         private string _phone;
         private string _email;
-        private List<Order> _orders = new List<Order>();
+        private List<Order> _orders = new();
 
         [Required]
-        [Range(0, 9999)] //Id får inte vara negativt
+        [Range(0, 999999)] //Id får inte vara negativt
         public int Id 
         { 
             get 
@@ -28,7 +28,7 @@ namespace WarehouseAutomation.Data
         }
 
         [Required]
-        [StringLength(20, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 3)]
+        [StringLength(40, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 3)]
         public string Name
         {
             get

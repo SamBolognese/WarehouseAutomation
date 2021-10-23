@@ -9,47 +9,45 @@ namespace WarehouseAutomation.Data
 {
     public class CustomerRepository : ICustomerRepository
     {
-        private WarehouseDBContext context;
-        private DbSet<Customer> dbSet;
+        private readonly WarehouseDBContext context;
 
         public CustomerRepository(WarehouseDBContext context)
         {
             this.context = context;
-            dbSet = context.Customers;
         }
-        public void Add(Customer entity)
+        public async Task<Customer> AddAsync(Customer entity)
         {
-            dbSet.Add(entity);
-        }
-
-        public IEnumerable<Order> GetActiveOrders()
-        {
-            throw new NotImplementedException();
+            context.Customers.Add(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public IEnumerable<Customer> GetAll()
+        public async Task<IEnumerable<Customer>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await context.Customers.ToListAsync();
         }
 
-        public IEnumerable<Order> GetArchivedOrders()
+        public async Task<IEnumerable<Order>> GetActiveOrdersAsync(Customer customer)
         {
-            throw new NotImplementedException();
+            return await context.Orders.Where(o => o.CustomerId == customer.Id && o.Dispatched == false).ToListAsync();
         }
 
-        public void Remove(Customer entity)
+        public async Task<IEnumerable<Order>> GetArchivedOrdersAsync(Customer customer)
         {
-            dbSet.Remove(entity);
+            return await context.Orders.Where(o => o.CustomerId == customer.Id && o.Dispatched == true).ToListAsync();
         }
 
-        public void Save()
+        public async Task<Customer> RemoveAsync(Customer entity)
         {
-            throw new NotImplementedException();
+            context.Customers.Remove(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public void Update(Customer entity)
+        public async Task<Customer> UpdateAsync(Customer entity)
         {
-            throw new NotImplementedException();
+            await context.SaveChangesAsync();
+            return entity;
         }
     }
 }

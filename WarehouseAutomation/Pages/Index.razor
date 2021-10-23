@@ -6,63 +6,94 @@
 @inject ICustomerRepository CustomerRepository
 @inject IOrderRepository OrderRepository
 
+<h2>Orders</h2>
 <div class="container-fluid">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Customer Id</th>
-                <th>Customer</th>
-                <th>Delivery address</th>
-                <th>Payment status</th>
-                <th>Dispatch status</th>
-                <th>Order date</th>
-                <th>Products</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var order in OrderRepository.GetAll())
-            {
-                <tr @onclick="(() => SetOrderForUpdates(order))">
-                    <td>@order.Id</td>
-                    <td>@order.CustomerId</td>
-                    <td>@order.Customer</td>
-                    <td>@order.DeliveryAddress</td>
-                    <td>@order.PaymentCompleted</td>
-                    <td>@order.Dispatched</td>
-                    <td>@order.OrderDate.</td>
-                    <td>
-                    </td>
-                    <td><button class="btn-danger" @onclick="(() => DeleteOrder(order))">Delete</button></td>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Customer Id</th>
+                    <th>Delivery address</th>
+                    <th>Payment status</th>
+                    <th>Dispatch status</th>
+                    <th>Order date</th>
+                    <th>Products</th>
+                    <th>Remove Order</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
-<EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-group">
-
+            </thead>
+            <tbody>
+                @foreach (var order in orders)
+                {
+                    <tr @onclick="(() => SetOrderForUpdates(order))">
+                        <td>@order.Id</td>
+                        <td>@order.CustomerId</td>
+                        <td>@order.DeliveryAddress</td>
+                        <td>@order.PaymentCompleted</td>
+                        <td>@order.Dispatched</td>
+                        <td>@order.OrderDate.</td>
+                        <td><button class="btn btn-outline-info">Show products</button></td>
+                        <td><button class="btn btn-danger" @onclick="(() => DeleteOrder(order))">Remove order</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</EditForm>
 
-<EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder(updatedOrder))">
+    <EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="customer Id">Customer Id</label>
+            <input @bind-value="@newOrder.CustomerId" type="text" />
+        </div>
+        <div class="form-group">
+            <label for="delivery address">Delivery address</label>
+            <input @bind-value="@newOrder.DeliveryAddress" type="text" />
+        </div>
+        <button class="btn btn-info" type="submit">Add order</button>
+    </EditForm>
 
-</EditForm>
+    <EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder(updatedOrder))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <div class="form-group">
+                <label for="customer Id">Customer Id</label>
+                <input @bind-value="@newOrder.CustomerId" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="delivery address">Delivery address</label>
+                <input @bind-value="@newOrder.DeliveryAddress" type="text" />
+            </div>
+            <div class="form-check">
+                <label for="payment status">Payment completed</label>
+                <input @bind-value="@newOrder.PaymentCompleted" type="checkbox">
+            </div>
+        </div>
+        <button class="btn btn-info" type="submit">Update order</button>
+    </EditForm>
+</div>
 
 
 @code
 {
-    Order newOrder = new Order();
-    private void AddOrder(Order order)
+    List<Order> orders;
+
+    protected override async Task OnInitializedAsync()
     {
-        OrderRepository.Add(order);
-        OrderRepository.Save();
+        orders = await OrderRepository.GetAllAsync() as List<Order>;
     }
 
+    Order newOrder = new Order();
     Order updatedOrder = new Order();
+
+    private void AddOrder(Order order)
+    {
+        OrderRepository.AddAsync(order);
+        newOrder = new Order();
+    }
+
     private void SetOrderForUpdates(Order selected)
     {
         updatedOrder = selected;
@@ -70,14 +101,12 @@
 
     private void UpdateOrder(Order order)
     {
-        OrderRepository.Update(order);
-        OrderRepository.Save();
+        OrderRepository.UpdateAsync(order);
     }
 
     private void DeleteOrder(Order order)
     {
-        OrderRepository.Remove(order);
-        OrderRepository.Save();
+        OrderRepository.RemoveAsync(order);
     }
 }
 

@@ -14,7 +14,7 @@ namespace WarehouseAutomation.Data
         private string _deliveryAddress;
         private bool _paymentCompleted;
         private bool _dispatched;
-        private List<OrderLine> _items = new List<OrderLine>();
+        private List<OrderLine> _items = new();
 
         [Required]
         [Range(0, 9999)]

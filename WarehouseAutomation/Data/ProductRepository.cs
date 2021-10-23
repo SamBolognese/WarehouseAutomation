@@ -9,49 +9,48 @@ namespace WarehouseAutomation.Data
 {
     public class ProductRepository : IProductRepository
     {
-        //Unqiqique Id add
-        private WarehouseDBContext context;
-        private DbSet<Product> dbSet;
+        private readonly WarehouseDBContext context;
 
         public ProductRepository(WarehouseDBContext context)
         {
             this.context = context;
-            dbSet = context.Products;
         }
 
-        public void Add(Product entity)
+        public async Task<Product> AddAsync(Product entity)
         {
-            dbSet.Add(entity);
+            context.Products.Add(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public IEnumerable<Product> GetAll()
+        public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await context.Products.ToListAsync();
         }
 
-        public IEnumerable<Product> GetOutOfStock()
+        public async Task<IEnumerable<Product>> GetOutOfStockAsync()
         {
-            throw new NotImplementedException();
+            return await context.Products.Where(p => p.Stock == 0).ToListAsync();
         }
 
-        public DateTime GetRestockingDate()
+        public async Task<DateTime> GetRestockingDateAsync(Product product)
         {
-            throw new NotImplementedException();
+            product.RestockingDate = DateTime.Now.AddDays(10);
+            await context.SaveChangesAsync();
+            return product.RestockingDate;
         }
 
-        public void Remove(Product entity)
+        public async Task<Product> RemoveAsync(Product entity)
         {
-            dbSet.Remove(entity);
+            context.Products.Remove(entity);
+            await context.SaveChangesAsync();
+            return entity;
         }
 
-        public void Save()
+        public async Task<Product> UpdateAsync(Product entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Product entity)
-        {
-            throw new NotImplementedException();
+            await context.SaveChangesAsync();
+            return entity;
         }
     }
 }
