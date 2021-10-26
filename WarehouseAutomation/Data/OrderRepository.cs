@@ -49,5 +49,30 @@ namespace WarehouseAutomation.Data
             await context.SaveChangesAsync();
             return entity;
         }
+
+        public async Task<bool> ItemsInStockAsync(Order entity)
+        {
+            List<Product> products = await context.Products.ToListAsync();
+
+            //FUNGERAR???
+            return context.Products.All(p => !entity.Items.Where(i => i.Product == p && i.Quantity > p.Stock).Any());
+
+            //return await context.Products.Where(p => p.Stock == 0).ToListAsync();
+
+            //return context.Products.All(p => p.Stock >= entity.Items.Where(i => i.Product == p));
+
+            //from 
+            //select p.Stock from p in products && select i.Quantity from i in Items
+            //join p on 
+
+            //if(products[i].Stock <= entity.Items[i].Quantity)
+           
+        }
+
+        public async Task<Order> UpdateDispatchStatusAsync(Order order)
+        {
+            context.Orders.Where(o => o.Id == order.Id).ToList().ForEach(o => o.Dispatched = true);
+            return order;
+        }
     }
 }

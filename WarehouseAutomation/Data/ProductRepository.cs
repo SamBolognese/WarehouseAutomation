@@ -52,5 +52,21 @@ namespace WarehouseAutomation.Data
             await context.SaveChangesAsync();
             return entity;
         }
+
+        public async Task<Order> UpdateStockAsync(Order order)
+        {
+            List<Product> products = await context.Products.ToListAsync();
+            foreach (OrderLine item in order.Items)
+            {
+                context.Products.Where(p => p == item.Product).ToList().ForEach(s => s.Stock -= item.Quantity);
+                //context.Products.Where(p => p == item.Product).Select(p => { p.Stock -= item.Quantity; return p; });
+                //List<OrderLine> querylist = context.Products.Where(p => p == item.Product);
+                //var query = context.Products.Where(p => p == item.Product);
+                //query.Select(q => q.Stock -= item.Quantity);
+                //query.Stock = query.Product.Stock - item.Quantity;
+            }
+            await context.SaveChangesAsync();
+            return order;
+        }
     }
 }
