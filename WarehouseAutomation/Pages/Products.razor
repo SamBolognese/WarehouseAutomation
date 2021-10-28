@@ -102,6 +102,10 @@
             <label for="price">Product price</label>
             <input @bind-value="@updatedProduct.Price" type="text" />
         </div>
+        <div class="form-group">
+            <label for="stock">Product stock</label>
+            <input @bind-value="@updatedProduct.Stock" type="text" />
+        </div>
         <button class="btn btn-info" type="submit">Update product</button>
     </EditForm>
 </div>

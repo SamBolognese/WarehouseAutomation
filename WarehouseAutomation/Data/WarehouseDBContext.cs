@@ -8,6 +8,9 @@ namespace WarehouseAutomation.Data
 {
     public class WarehouseDBContext : DbContext
     {
+        /// <summary>
+        /// A WarehouseDBContext constructor that inherits from the base DbContext class
+        /// </summary>
         public WarehouseDBContext(DbContextOptions<WarehouseDBContext> options) : base(options)
         {
             Database.EnsureCreated();

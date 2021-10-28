@@ -15,7 +15,9 @@ namespace WarehouseAutomation.Data
         private Order _order;
         private int _quantity;
 
-
+        /// <summary>
+        /// Sets the value of an orderline id and prevents the value from being negative
+        /// </summary> 
         [Required]
         [Range(0, 9999)]
         public int Id
@@ -29,6 +31,9 @@ namespace WarehouseAutomation.Data
                 _id = value;
             }
         }
+        /// <summary>
+        /// Sets the value of the product id and prevents the value from being negative
+        /// </summary> 
         [Required]
         [Range(0, 9999)]
         public int ProductId
@@ -42,6 +47,9 @@ namespace WarehouseAutomation.Data
                 _productId = value;
             }
         }
+        /// <summary>
+        /// Sets the value of a product object
+        /// </summary> 
         [Required]
         public Product Product
         {
@@ -54,6 +62,9 @@ namespace WarehouseAutomation.Data
                 _product = value;
             }
         }
+        /// <summary>
+        /// Sets the value of a order Id and prevents it from being negative
+        /// </summary>
         [Required]
         [Range(0, 9999)]
         public int OrderId
@@ -67,7 +78,9 @@ namespace WarehouseAutomation.Data
                 _orderId = value;
             }
         }
-        [Required]
+        /// <summary>
+        /// sets the value of an order 
+        /// </summary>
         public Order Order
         {
             get
@@ -79,7 +92,11 @@ namespace WarehouseAutomation.Data
                 _order = value;
             }
         }
+        /// <summary>
+        /// sets the value of the quantity
+        /// </summary> 
         [Required]
+        [Range(1, 9999)]
         public int Quantity
         {
             get

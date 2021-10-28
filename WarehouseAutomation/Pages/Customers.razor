@@ -5,6 +5,7 @@
 @inject IProductRepository ProductRepository
 @inject ICustomerRepository CustomerRepository
 @inject IOrderRepository OrderRepository
+@inject NavigationManager NavManager
 
 <h2>Customers</h2>
 <div class="container-fluid">
@@ -28,7 +29,7 @@
                         <td>@customer.Name</td>
                         <td>@customer.Phone</td>
                         <td>@customer.Email</td>
-                        <td><button class="btn btn-outline-info">Show orders</button></td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => OrderViewNavigation(customer))">Show orders</button></td>
                         <td><button class="btn btn-danger" @onclick="(() => DeleteCustomer(customer))">Delete customer</button></td>
                     </tr>
                 }
@@ -55,6 +56,8 @@
     </EditForm>
 
     <EditForm Model="@updatedCustomer" OnValidSubmit="(() => UpdateCustomer(updatedCustomer))">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="form-group">
             <label for="name">Customer name</label>
             <input @bind-value="@updatedCustomer.Name" type="text" />
@@ -83,10 +86,11 @@
     Customer newCustomer = new Customer();
     Customer updatedCustomer = new Customer();
 
-    private void AddCustomer(Customer customer)
+    private async Task AddCustomer(Customer customer)
     {
-        CustomerRepository.AddAsync(customer);
+        await CustomerRepository.AddAsync(customer);
         newCustomer = new Customer();
+        await GuiUpdate();
     }
 
     private void SetCustomerForUpdates(Customer selected)
@@ -94,17 +98,23 @@
         updatedCustomer = selected;
     }
 
-    private void UpdateCustomer(Customer customer)
+    private async Task UpdateCustomer(Customer customer)
     {
-        CustomerRepository.UpdateAsync(customer);
+        await CustomerRepository.UpdateAsync(customer);
     }
 
-    private void DeleteCustomer(Customer customer)
+    private async Task DeleteCustomer(Customer customer)
     {
-        CustomerRepository.RemoveAsync(customer);
+        await CustomerRepository.RemoveAsync(customer);
+        await GuiUpdate();
     }
     private async Task GuiUpdate()
     {
         await OnInitializedAsync();
+    }
+
+    private void OrderViewNavigation(Customer customer)
+    {
+        NavManager.NavigateTo($"/OrderView/{customer.Id}");
     }
 }

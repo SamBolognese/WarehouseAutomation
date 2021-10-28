@@ -14,7 +14,9 @@ namespace WarehouseAutomation.Data
         private double _price;
         private int _stock;
         private DateTime _restockingDate;
-
+        /// <summary>
+        /// sets the value of the product ID
+        /// </summary> 
         [Required]
         [Range(0, 9999)] //Id får inte vara negativt
         public int Id
@@ -28,9 +30,11 @@ namespace WarehouseAutomation.Data
                 _id = value;
             }
         }
-
+        /// <summary>
+        /// sets the value of the product name
+        /// </summary>  
         [Required]
-        [StringLength(20, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 3)]
+        [StringLength(20, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 1)]
         public string Name 
         {
             get
@@ -42,7 +46,9 @@ namespace WarehouseAutomation.Data
                 _name = value;
             }
         }
-
+        /// <summary>
+        /// sets the description of a product
+        /// </summary> 
         [Required]
         [StringLength(maximumLength: 1000)]
         public string Description
@@ -57,6 +63,9 @@ namespace WarehouseAutomation.Data
                 _description = value;
             }
         }
+        /// <summary>
+        /// sets the value of the product price
+        /// </summary> 
         [Required]
         [Range(1, Double.PositiveInfinity)]
         public double Price
@@ -64,13 +73,15 @@ namespace WarehouseAutomation.Data
             get
             {
                 return _price;
-
             }
             set
             {
                 _price = value;
             }
         }
+        /// <summary>
+        /// sets the value of the product stock
+        /// </summary> 
         [Required]
         [Range(0, 100)]
         public int Stock
@@ -84,6 +95,9 @@ namespace WarehouseAutomation.Data
                 _stock = value;
             }
         }
+        /// <summary>
+        /// sets the value of restocking date
+        /// </summary> 
         [Required]
         public DateTime RestockingDate
         {

@@ -1,4 +1,4 @@
-﻿@page "/OrderLineView/{orderId:int}"
+﻿@page "/OrderedLinesView/{orderId:int}"
 @using WarehouseAutomation.Data;
 @using WarehouseAutomation.Data.Interfaces;
 
@@ -19,7 +19,6 @@
                     <th>Product name</th>
                     <th>Order Id</th>
                     <th>Quantity</th>
-                    <th>Remove item</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,7 +30,6 @@
                         <td>@orderLine.Product.Name</td>
                         <td>@orderLine.OrderId</td>
                         <td>@orderLine.Quantity</td>
-                        <td><button class="btn btn-danger" @onclick="(() => DeleteOrderLine(orderLine))">Remove item</button></td>
                     </tr>
                 }
             </tbody>
@@ -53,11 +51,5 @@
     private async Task GuiUpdate()
     {
         await OnInitializedAsync();
-    }
-
-    private async Task DeleteOrderLine(OrderLine orderLine)
-    {
-        await OrderLineRepository.RemoveAsync(orderLine);
-        await GuiUpdate();
     }
 }

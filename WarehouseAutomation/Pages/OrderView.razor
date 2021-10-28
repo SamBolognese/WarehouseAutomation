@@ -1,0 +1,115 @@
+﻿@page "/OrderView/{customerId:int}"
+@using WarehouseAutomation.Data;
+@using WarehouseAutomation.Data.Interfaces;
+
+@inject IProductRepository ProductRepository
+@inject ICustomerRepository CustomerRepository
+@inject IOrderRepository OrderRepository
+@inject IOrderLineRepository OrderLineRepository
+@inject NavigationManager NavManager
+
+<h2>Orders</h2>
+<div class="container-fluid">
+    <h3>Dispatched orders</h3>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Customer Id</th>
+                    <th>Delivery address</th>
+                    <th>Payment status</th>
+                    <th>Dispatch status</th>
+                    <th>Order date</th>
+                    <th>Products</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in ordersDispatched)
+                {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.CustomerId</td>
+                    <td>@order.DeliveryAddress</td>
+                    <td>@PaymentStatus(order.PaymentCompleted)</td>
+                    <td>@DispatchedStatus(order.Dispatched)</td>
+                    <td>@order.OrderDate.</td>
+                    <td><button class="btn btn-outline-info" @onclick="(() => OrderedlinesViewNavigation(order))">Show products</button></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <h3>Pending orders</h3>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Customer Id</th>
+                    <th>Delivery address</th>
+                    <th>Payment status</th>
+                    <th>Dispatch status</th>
+                    <th>Order date</th>
+                    <th>Products</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in ordersNotDispatched)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.CustomerId</td>
+                        <td>@order.DeliveryAddress</td>
+                        <td>@PaymentStatus(order.PaymentCompleted)</td>
+                        <td>@DispatchedStatus(order.Dispatched)</td>
+                        <td>@order.OrderDate.</td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => OrderlineViewNavigation(order))">Show products</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int customerId { get; set; }
+
+    List<Order> ordersDispatched;
+    List<Order> ordersNotDispatched;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ordersDispatched = await OrderRepository.GetDispatchedOrdersAsync(customerId) as List<Order>;
+        ordersNotDispatched = await OrderRepository.GetPendingOrdersAsync(customerId) as List<Order>;
+    }
+
+    private void OrderlineViewNavigation(Order order)
+    {
+        NavManager.NavigateTo($"/OrderLineView/{order.Id}");
+    }
+
+    private void OrderedlinesViewNavigation(Order order)
+    {
+        NavManager.NavigateTo($"/OrderedLinesView/{order.Id}");
+    }
+
+    private string PaymentStatus(bool status)
+    {
+        if (status == true)
+        {
+            return "Paid";
+        }
+        else return "Not paid";
+    }
+    private string DispatchedStatus(bool dispatched)
+    {
+        if (dispatched == true)
+        {
+            return "Dispatched";
+        }
+        else return "Not dispatched";
+    }
+
+}
