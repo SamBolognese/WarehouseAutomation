@@ -9,5 +9,7 @@ namespace WarehouseAutomation.Data.Interfaces
     {
         Task<IEnumerable<Order>> GetDispatchedOrdersAsync();
         Task<IEnumerable<Order>> GetPendingOrdersAsync();
+        Task<bool> ItemsInStockAsync(Order entity);
+        Task<Order> UpdateDispatchStatusAsync(Order entity);
     }
 }

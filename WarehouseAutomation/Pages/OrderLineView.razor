@@ -1,0 +1,51 @@
+﻿@page "/OrderLineView"
+@using WarehouseAutomation.Data;
+@using WarehouseAutomation.Data.Interfaces;
+
+@inject IProductRepository ProductRepository
+@inject ICustomerRepository CustomerRepository
+@inject IOrderRepository OrderRepository
+@inject NavigationManager NavManager
+
+<div class="container-fluid">
+    <h3>Dispatched orders</h3>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>ProductId</th>
+                    <th>Product</th>
+                    <th>OrderId</th>
+                    <th>Order</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var orderLine in orderLines)
+                {
+                <tr>
+                    <td>@orderLine.Id</td>
+                    <td>@orderLine.ProductId</td>
+                    <td>@orderLine.Product</td>
+                    <td>@orderLine.OrderId</td>
+                    <td>@orderLine.Order</td>
+                    <td>@orderLine.Quantity</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    List<OrderLine> orderLines = new List<OrderLine>();
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+    private async Task GuiUpdate()
+    {
+            await OnInitializedAsync();
+    }
+}

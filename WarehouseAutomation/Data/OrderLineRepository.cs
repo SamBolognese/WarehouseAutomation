@@ -39,5 +39,10 @@ namespace WarehouseAutomation.Data
             await context.SaveChangesAsync();
             return entity;
         }
+
+        public async Task<IEnumerable<OrderLine>> GetOrderLinesOrderIdAsync(int orderId)
+        {
+            return await context.OrderLines.Where(o => o.OrderId == orderId).ToListAsync();
+        }
     }
 }

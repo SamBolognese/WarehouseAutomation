@@ -122,11 +122,12 @@
     Product updatedProduct = new Product();
 
 
-    private void AddProduct(Product product)
+    private async Task AddProduct(Product product)
     {
-        ProductRepository.AddAsync(product);
+        await ProductRepository.AddAsync(product);
         newProduct = new Product();
-    }
+        await GuiUpdate();
+        }
 
     private void SetProductForUpdates(Product selected)
     {
@@ -138,8 +139,14 @@
         ProductRepository.UpdateAsync(product);
     }
 
-    private void DeleteProduct(Product product)
+    private async Task DeleteProduct(Product product)
     {
-        ProductRepository.RemoveAsync(product);
+        await ProductRepository.RemoveAsync(product);
+        await GuiUpdate();
+    }
+
+    private async Task GuiUpdate()
+    {
+        await OnInitializedAsync();
     }
 }

@@ -5,9 +5,41 @@
 @inject IProductRepository ProductRepository
 @inject ICustomerRepository CustomerRepository
 @inject IOrderRepository OrderRepository
+@inject NavigationManager NavManager
 
 <h2>Orders</h2>
 <div class="container-fluid">
+    <h3>Dispatched orders</h3>
+    <div class="row bg-light">
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Customer Id</th>
+                    <th>Delivery address</th>
+                    <th>Payment status</th>
+                    <th>Dispatch status</th>
+                    <th>Order date</th>
+                    <th>Products</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in ordersDispatched)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.CustomerId</td>
+                        <td>@order.DeliveryAddress</td>
+                        <td>@order.PaymentCompleted</td>
+                        <td>@order.Dispatched</td>
+                        <td>@order.OrderDate.</td>
+                        <td><button class="btn btn-outline-info">Show products</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <h3>Pending orders</h3>
     <div class="row bg-light">
         <table class="table table-bordered">
             <thead class="thead-light">
@@ -23,7 +55,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var order in orders)
+                @foreach (var order in ordersNotDispatched)
                 {
                     <tr @onclick="(() => SetOrderForUpdates(order))">
                         <td>@order.Id</td>
@@ -40,58 +72,34 @@
         </table>
     </div>
 
-    <EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="customer Id">Customer Id</label>
-            <input @bind-value="@newOrder.CustomerId" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="delivery address">Delivery address</label>
-            <input @bind-value="@newOrder.DeliveryAddress" type="text" />
-        </div>
-        <button class="btn btn-info" type="submit">Add order</button>
-    </EditForm>
+    <button class="btn btn-info" @onclick=@(() => OrderNavigation())>Add order</button>
 
-    <EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder(updatedOrder))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <div class="form-group">
-                <label for="customer Id">Customer Id</label>
-                <input @bind-value="@newOrder.CustomerId" type="text" />
-            </div>
-            <div class="form-group">
-                <label for="delivery address">Delivery address</label>
-                <input @bind-value="@newOrder.DeliveryAddress" type="text" />
-            </div>
-            <div class="form-check">
-                <label for="payment status">Payment completed</label>
-                <input @bind-value="@newOrder.PaymentCompleted" type="checkbox">
-            </div>
-        </div>
-        <button class="btn btn-info" type="submit">Update order</button>
-    </EditForm>
+    <button class="btn btn-info" @onclick=@(() => OrderNavigation())>Update order</button>
+
+    <button class="btn btn-info" @onclick="(() => ProcessOrders())">Process Orders</button>
 </div>
-
 
 @code
 {
     List<Order> orders;
+    List<Order> ordersDispatched;
+    List<Order> ordersNotDispatched;
 
     protected override async Task OnInitializedAsync()
     {
         orders = await OrderRepository.GetAllAsync() as List<Order>;
+        ordersDispatched = await OrderRepository.GetDispatchedOrdersAsync() as List<Order>;
+        ordersNotDispatched = await OrderRepository.GetPendingOrdersAsync() as List<Order>;
     }
 
     Order newOrder = new Order();
     Order updatedOrder = new Order();
 
-    private void AddOrder(Order order)
+    private async Task AddOrder(Order order)
     {
-        OrderRepository.AddAsync(order);
+        await OrderRepository.AddAsync(order);
         newOrder = new Order();
+        await GuiUpdate();
     }
 
     private void SetOrderForUpdates(Order selected)
@@ -102,11 +110,36 @@
     private void UpdateOrder(Order order)
     {
         OrderRepository.UpdateAsync(order);
+        updatedOrder = new Order();
     }
 
-    private void DeleteOrder(Order order)
+    private async Task DeleteOrder(Order order)
     {
-        OrderRepository.RemoveAsync(order);
+        await OrderRepository.RemoveAsync(order);
+        await GuiUpdate();
+    }
+
+    private void ProcessOrders()
+    {
+        foreach (Order order in ordersNotDispatched)
+        {
+            if (OrderRepository.ItemsInStockAsync(order).Result)
+            {
+                ProductRepository.UpdateStockAsync(order);
+                OrderRepository.UpdateDispatchStatusAsync(order);
+            }
+        }
+    }
+
+    private async Task GuiUpdate()
+    {
+        await OnInitializedAsync();
+    }
+
+    private void OrderNavigation()
+    {
+        NavManager.NavigateTo("/OrderLineCreator");
+
     }
 }
 

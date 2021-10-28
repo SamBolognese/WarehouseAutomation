@@ -7,6 +7,6 @@ namespace WarehouseAutomation.Data.Interfaces
 {
     interface IOrderLineRepository : IRepository<OrderLine>
     {
-
+        Task<IEnumerable<OrderLine>> GetOrderLinesOrderIdAsync(int orderId);
     }
 }

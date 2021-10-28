@@ -1,0 +1,38 @@
+﻿@page "/OrderLineCreator"
+@using WarehouseAutomation.Data;
+@using WarehouseAutomation.Data.Interfaces;
+
+
+@inject IProductRepository ProductRepository
+@inject ICustomerRepository CustomerRepository
+@inject IOrderRepository OrderRepository
+@inject NavigationManager NavManager
+
+
+
+<EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="dropdown-item-text">
+        <a class="dropdown-item" href="#">Action</a>
+        <a class="dropdown-item" href="#">Another action</a>
+        <a class="dropdown-item" href="#">Something else here</a>
+    </div>
+    <button class="btn btn-info" type="submit">Add order</button>
+
+</EditForm>
+
+
+@code
+{
+    Order newOrder = new Order();
+    //Form med alla grejer som inte är produkter
+    //någon grej som visar alla produkter som vi har, dessa kan man klicka på och ange ett nummer som motsvarar quantity i orderline
+    //
+
+    public void AddOrder(Order order)
+        {
+
+        }
+}

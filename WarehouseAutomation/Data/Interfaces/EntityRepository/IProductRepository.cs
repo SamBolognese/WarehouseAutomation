@@ -9,5 +9,7 @@ namespace WarehouseAutomation.Data.Interfaces
     {
         Task<IEnumerable<Product>> GetOutOfStockAsync();
         Task<DateTime> GetRestockingDateAsync(Product product);
+
+        Task<Order> UpdateStockAsync(Order order);
     }
 }
