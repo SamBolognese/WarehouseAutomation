@@ -112,7 +112,7 @@ namespace WarehouseAutomation.Data
             await context.Products.ToListAsync();
             foreach (OrderLine item in order.Items)
             {
-                if (item.Product.Stock <= item.Quantity)
+                if (item.Product.Stock < item.Quantity)
                 {
                     return false;
                 }

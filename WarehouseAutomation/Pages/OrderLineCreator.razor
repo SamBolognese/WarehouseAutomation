@@ -12,7 +12,7 @@
 <div class="container-fluid">
     <h4>All products:</h4>
     <div class="row bg-light">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th>Product name</th>
@@ -39,7 +39,7 @@
 
     <h4>Ordered items:</h4>
     <div class="row bg-light">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th>Product name</th>
@@ -62,17 +62,17 @@
         </table>
     </div>
 
-    <EditForm Model="@newOrderLine" OnValidSubmit="(() => AddOrderLine(newOrderLine))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="quantity">Item quantity</label>
-            <input @bind-value="@newOrderLine.Quantity" type="text" />
-        </div>
-        <button class="btn btn-info" type="submit">Add item</button>
-    </EditForm>
+        <EditForm Model="@newOrderLine" OnValidSubmit="(() => AddOrderLine(newOrderLine))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group m-2">
+                <label for="quantity">Item quantity</label>
+                <input @bind-value="@newOrderLine.Quantity" type="text" />
+            </div>
+            <button class="btn btn-info m-2" type="submit">Add item</button>
+        </EditForm>
 
-    <button class="btn btn-info" @onclick="(() => IndexNavigation())"type="button">Complete order</button>
+        <button class="btn btn-info m-2" @onclick="(() => IndexNavigation())" type="button">Complete order</button>
 </div>
 
 @code
@@ -91,6 +91,7 @@
         await OrderLineRepository.GetAllAsync();
         AddedOrderLines = await OrderLineRepository.GetOrderLinesOrderIdAsync(orderId) as List<OrderLine>;
         products = await ProductRepository.GetAllAsync() as List<Product>;
+        newOrderLine = new OrderLine();
     }
 
     private async Task GuiUpdate()
@@ -107,7 +108,7 @@
     private async Task AddOrderLine(OrderLine newOrderLine)
     {
         newOrderLine.Order = await OrderRepository.GetOrderByIdAsync(orderId) as Order;
-        await OrderLineRepository.AddAsync(newOrderLine); //Denna
+        await OrderLineRepository.AddAsync(newOrderLine);
         newOrderLine = new OrderLine();
         await GuiUpdate();
     }

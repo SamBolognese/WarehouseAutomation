@@ -28,7 +28,7 @@ namespace WarehouseAutomation.Data
         public async Task<OrderLine> AddAsync(OrderLine entity)
         {
             context.OrderLines.Add(entity);
-            await context.SaveChangesAsync(); //Denna
+            await context.SaveChangesAsync();
             return entity;
         }
         

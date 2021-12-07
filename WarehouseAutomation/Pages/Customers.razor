@@ -10,7 +10,7 @@
 <h2>Customers</h2>
 <div class="container-fluid">
     <div class="row bg-light">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th>Id</th>
@@ -37,44 +37,47 @@
         </table>
     </div>
 
-    <EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="name">Customer name</label>
-            <input @bind-value="@newCustomer.Name" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone number</label>
-            <input @bind-value="@newCustomer.Phone" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input @bind-value="@newCustomer.Email" type="text" />
-        </div>
-        <button class="btn btn-info" type="submit">Add customer</button>
-    </EditForm>
-
-    <EditForm Model="@updatedCustomer" OnValidSubmit="(() => UpdateCustomer(updatedCustomer))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="name">Customer name</label>
-            <input @bind-value="@updatedCustomer.Name" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone number</label>
-            <input @bind-value="@updatedCustomer.Phone" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="Email">Email</label>
-            <input @bind-value="@updatedCustomer.Email" type="text" />
-        </div>
-        <button class="btn btn-info" type="submit">Update customer</button>
-    </EditForm>
+    <div class='card p-3 bg-light m-2'>
+        <EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">Customer name</label>
+                <input @bind-value="@newCustomer.Name" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone number</label>
+                <input @bind-value="@newCustomer.Phone" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input @bind-value="@newCustomer.Email" type="text" />
+            </div>
+            <button class="btn btn-info" type="submit">Add customer</button>
+        </EditForm>
+    </div>
+    <div class='card p-3 bg-light m-2'>
+        <EditForm Model="@updatedCustomer" OnValidSubmit="(() => UpdateCustomer(updatedCustomer))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">Customer name</label>
+                <input @bind-value="@updatedCustomer.Name" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone number</label>
+                <input @bind-value="@updatedCustomer.Phone" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input @bind-value="@updatedCustomer.Email" type="text" />
+            </div>
+            <button class="btn btn-info" type="submit">Update customer</button>
+        </EditForm>
+    </div>
 </div>
 
-@code 
+@code
 {
     List<Customer> customers;
 

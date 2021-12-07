@@ -51,6 +51,7 @@ namespace WarehouseAutomation.Data
         /// <summary>
         /// sets the value of the customer object
         /// </summary> 
+        [Required]
         public Customer Customer
         {
             get
