@@ -2,8 +2,10 @@
 
 namespace WarehouseAutomation.Data
 {
+   
     public interface IOrder
     {
+      
         Customer Customer { get; set; }
         int CustomerId { get; set; }
         string DeliveryAddress { get; set; }

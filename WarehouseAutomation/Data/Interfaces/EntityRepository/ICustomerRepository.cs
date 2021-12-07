@@ -7,6 +7,7 @@ namespace WarehouseAutomation.Data.Interfaces
 {
     interface ICustomerRepository : IRepository<Customer>
     {
+       
         Task<IEnumerable<Order>> GetArchivedOrdersAsync(Customer customer);
         Task<IEnumerable<Order>> GetActiveOrdersAsync(Customer customer);
     }

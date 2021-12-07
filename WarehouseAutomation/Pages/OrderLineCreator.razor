@@ -1,38 +1,128 @@
-﻿@page "/OrderLineCreator"
+﻿@page "/OrderLineCreator/{orderId:int}"
 @using WarehouseAutomation.Data;
 @using WarehouseAutomation.Data.Interfaces;
-
 
 @inject IProductRepository ProductRepository
 @inject ICustomerRepository CustomerRepository
 @inject IOrderRepository OrderRepository
+@inject IOrderLineRepository OrderLineRepository
 @inject NavigationManager NavManager
 
 
-
-<EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="dropdown-item-text">
-        <a class="dropdown-item" href="#">Action</a>
-        <a class="dropdown-item" href="#">Another action</a>
-        <a class="dropdown-item" href="#">Something else here</a>
+<div class="container-fluid">
+    <h4>All products:</h4>
+    <div class="row bg-light">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Product name</th>
+                    <th>Product description</th>
+                    <th>Product price</th>
+                    <th>Products in stock</th>
+                    <th>Select item</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in products)
+                {
+                    <tr>
+                        <td>@product.Name</td>
+                        <td>@product.Description</td>
+                        <td>@product.Price</td>
+                        <td>@product.Stock</td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => ChooseItem(product))">Select item</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-    <button class="btn btn-info" type="submit">Add order</button>
 
-</EditForm>
+    <h4>Ordered items:</h4>
+    <div class="row bg-light">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Product name</th>
+                    <th>Product price</th>
+                    <th>Quantity</th>
+                    <th>Remove item</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (OrderLine item in AddedOrderLines)
+                {
+                    <tr>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Product.Price</td>
+                        <td>@item.Quantity</td>
+                        <td><button class="btn btn-danger" @onclick="(() => DeleteOrderLine(item))">Remove item</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
+        <EditForm Model="@newOrderLine" OnValidSubmit="(() => AddOrderLine(newOrderLine))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group m-2">
+                <label for="quantity">Item quantity</label>
+                <input @bind-value="@newOrderLine.Quantity" type="text" />
+            </div>
+            <button class="btn btn-info m-2" type="submit">Add item</button>
+        </EditForm>
+
+        <button class="btn btn-info m-2" @onclick="(() => IndexNavigation())" type="button">Complete order</button>
+</div>
 
 @code
 {
-    Order newOrder = new Order();
-    //Form med alla grejer som inte är produkter
-    //någon grej som visar alla produkter som vi har, dessa kan man klicka på och ange ett nummer som motsvarar quantity i orderline
-    //
+    [Parameter]
+    public int orderId { get; set; }
 
-    public void AddOrder(Order order)
-        {
+    List<OrderLine> AddedOrderLines = new List<OrderLine>();
 
-        }
+    List<Product> products;
+    OrderLine newOrderLine = new OrderLine();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OrderRepository.GetAllAsync();
+        await OrderLineRepository.GetAllAsync();
+        AddedOrderLines = await OrderLineRepository.GetOrderLinesOrderIdAsync(orderId) as List<OrderLine>;
+        products = await ProductRepository.GetAllAsync() as List<Product>;
+        newOrderLine = new OrderLine();
+    }
+
+    private async Task GuiUpdate()
+    {
+        await OnInitializedAsync();
+    }
+
+    private void ChooseItem(Product product)
+    {
+        newOrderLine = new OrderLine();
+        newOrderLine.Product = product;
+    }
+
+    private async Task AddOrderLine(OrderLine newOrderLine)
+    {
+        newOrderLine.Order = await OrderRepository.GetOrderByIdAsync(orderId) as Order;
+        await OrderLineRepository.AddAsync(newOrderLine);
+        newOrderLine = new OrderLine();
+        await GuiUpdate();
+    }
+
+    private async Task DeleteOrderLine(OrderLine orderLine)
+    {
+        await OrderLineRepository.RemoveAsync(orderLine);
+        await GuiUpdate();
+    }
+
+    private void IndexNavigation()
+    {
+        NavManager.NavigateTo("/");
+    }
 }
+
+

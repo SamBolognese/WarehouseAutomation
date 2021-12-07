@@ -13,8 +13,11 @@ namespace WarehouseAutomation.Data
         private string _email;
         private List<Order> _orders = new();
 
+        /// <summary>
+        /// Sets the value of the Customer ID
+        /// </summary>
         [Required]
-        [Range(0, 999999)] //Id får inte vara negativt
+        [Range(0, 999999)] 
         public int Id 
         { 
             get 
@@ -27,8 +30,11 @@ namespace WarehouseAutomation.Data
             } 
         }
 
+        /// <summary>
+        /// Sets the value of the Customer name, must be between 1 and 40 characters
+        /// </summary>
         [Required]
-        [StringLength(40, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 3)]
+        [StringLength(40, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 1)]
         public string Name
         {
             get
@@ -40,8 +46,13 @@ namespace WarehouseAutomation.Data
                 _name = value;
             }
         }
+
+        /// <summary>
+        /// Sets the value of the Customer Phonenumber, must be 10 characters long and may only contain numbers
+        /// </summary>
         [Required]
         [StringLength(10, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 10)]
+        [RegularExpression("[^[0-9]+$]", ErrorMessage = "Phone numbers can only contain numbers.")]
         public string Phone 
         {
             get
@@ -54,6 +65,9 @@ namespace WarehouseAutomation.Data
             }
         }
 
+        /// <summary>
+        /// Sets the value of the Customer Email, must be between 5 and 100 characters long
+        /// </summary>
         [Required]
         [StringLength(100, ErrorMessage = "{0} length must be between {2} and {1}.", MinimumLength = 5)]
         public string Email
@@ -67,6 +81,10 @@ namespace WarehouseAutomation.Data
                 _email = value;
             }
         }
+
+        /// <summary>
+        /// Sets the value to the list of Orders
+        /// </summary>
         public List<Order> Orders
         {
             get

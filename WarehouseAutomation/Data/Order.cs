@@ -16,9 +16,12 @@ namespace WarehouseAutomation.Data
         private bool _dispatched;
         private List<OrderLine> _items = new();
 
+        /// <summary>
+        /// sets the value of the order ID
+        /// </summary> 
         [Required]
         [Range(0, 9999)]
-        public int Id
+        public int Id          
         {
             get
             {
@@ -29,8 +32,11 @@ namespace WarehouseAutomation.Data
                 _id = value;
             }
         }
+        /// <summary>
+        /// sets the value of the customer ID
+        /// </summary> 
         [Required]
-        [Range(0, 9999)]
+        [Range(0, 999999)]
         public int CustomerId
         {
             get
@@ -42,6 +48,9 @@ namespace WarehouseAutomation.Data
                 _customerId = value;
             }
         }
+        /// <summary>
+        /// sets the value of the customer object
+        /// </summary> 
         [Required]
         public Customer Customer
         {
@@ -54,6 +63,9 @@ namespace WarehouseAutomation.Data
                 _customer = value;
             }
         }
+        /// <summary>
+        /// sets the date time of an order
+        /// </summary> 
         [Required]
         public DateTime OrderDate
         {
@@ -66,6 +78,9 @@ namespace WarehouseAutomation.Data
                 _orderDate = value;
             }
         }
+        /// <summary>
+        /// sets the value of the delivery adress
+        /// </summary>  
         [Required]
         [StringLength(50, ErrorMessage = "", MinimumLength = 1)]
         public string DeliveryAddress
@@ -79,6 +94,9 @@ namespace WarehouseAutomation.Data
                 _deliveryAddress = value;
             }
         }
+        /// <summary>
+        /// sets the value true or false if payment is completed or not
+        /// </summary> 
         [Required]
         public bool PaymentCompleted
         {
@@ -91,6 +109,9 @@ namespace WarehouseAutomation.Data
                 _paymentCompleted = value;
             }
         }
+        /// <summary>
+        /// sets the value true or false if an order is dispatched or not
+        /// </summary> 
         [Required]
         public bool Dispatched
         {
@@ -103,6 +124,9 @@ namespace WarehouseAutomation.Data
                 _dispatched = value;
             }
         }
+        /// <summary>
+        /// sets the value of a list of orderlines 
+        /// </summary> 
         [Required]
         public List<OrderLine> Items
         {

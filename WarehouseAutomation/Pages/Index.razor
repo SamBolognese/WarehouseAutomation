@@ -5,13 +5,13 @@
 @inject IProductRepository ProductRepository
 @inject ICustomerRepository CustomerRepository
 @inject IOrderRepository OrderRepository
+@inject IOrderLineRepository OrderLineRepository
 @inject NavigationManager NavManager
 
-<h2>Orders</h2>
 <div class="container-fluid">
     <h3>Dispatched orders</h3>
-    <div class="row bg-light">
-        <table class="table table-bordered">
+    <div class="row bg-light ">
+        <table class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th>Id</th>
@@ -30,10 +30,10 @@
                         <td>@order.Id</td>
                         <td>@order.CustomerId</td>
                         <td>@order.DeliveryAddress</td>
-                        <td>@order.PaymentCompleted</td>
-                        <td>@order.Dispatched</td>
+                        <td>@PaymentStatus(order.PaymentCompleted)</td>
+                        <td>@DispatchedStatus(order.Dispatched)</td>
                         <td>@order.OrderDate.</td>
-                        <td><button class="btn btn-outline-info">Show products</button></td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => OrderedlinesViewNavigation(order))">Show products</button></td>
                     </tr>
                 }
             </tbody>
@@ -41,15 +41,17 @@
     </div>
     <h3>Pending orders</h3>
     <div class="row bg-light">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th>Id</th>
                     <th>Customer Id</th>
+                    <th>Customer Name</th>
                     <th>Delivery address</th>
                     <th>Payment status</th>
                     <th>Dispatch status</th>
                     <th>Order date</th>
+                    <th>Earliest dispatch date</th>
                     <th>Products</th>
                     <th>Remove Order</th>
                 </tr>
@@ -60,11 +62,13 @@
                     <tr @onclick="(() => SetOrderForUpdates(order))">
                         <td>@order.Id</td>
                         <td>@order.CustomerId</td>
+                        <td>@order.Customer.Name</td>
                         <td>@order.DeliveryAddress</td>
-                        <td>@order.PaymentCompleted</td>
-                        <td>@order.Dispatched</td>
+                        <td>@PaymentStatus(order.PaymentCompleted)</td>
+                        <td>@DispatchedStatus(order.Dispatched)</td>
                         <td>@order.OrderDate.</td>
-                        <td><button class="btn btn-outline-info">Show products</button></td>
+                        <td>@EarliestDispatch(order)</td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => OrderlineViewNavigation(order))">Show products</button></td>
                         <td><button class="btn btn-danger" @onclick="(() => DeleteOrder(order))">Remove order</button></td>
                     </tr>
                 }
@@ -72,11 +76,56 @@
         </table>
     </div>
 
-    <button class="btn btn-info" @onclick=@(() => OrderNavigation())>Add order</button>
+    <button class="btn btn-outline-success mt-3" @onclick="(() => ProcessOrders())">Process Orders</button>
 
-    <button class="btn btn-info" @onclick=@(() => OrderNavigation())>Update order</button>
+    <div class='card p-3 bg-light m-2'>
+        <div class="row bg-light">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Customer Id</th>
+                        <th>Customer Name</th>
+                        <th>Choose customer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Customer customer in customers)
+                    {
+                        <tr>
+                            <td>@customer.Id</td>
+                            <td>@customer.Name</td>
+                            <td><button class="btn btn-outline-info" @onclick="(() => ChooseCustomer(customer))">Select customer</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-    <button class="btn btn-info" @onclick="(() => ProcessOrders())">Process Orders</button>
+        <EditForm Model="@newOrder" OnValidSubmit="(() => AddOrder(newOrder))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="address">Delivery address</label>
+                <input @bind-value="@newOrder.DeliveryAddress" type="text" />
+            </div>
+            <button class="btn btn-info" type="submit">Add order</button>
+        </EditForm>
+    </div>
+    <div class='card p-3 bg-light m-2'>
+        <h5>Click on a pending order to select it for updates.</h5>
+        <EditForm Model="@updatedOrder" OnValidSubmit="(() => UpdateOrder(updatedOrder))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="address">Delivery address</label>
+                <input @bind-value="@updatedOrder.DeliveryAddress" type="text" />
+            </div>
+            <div class="form-group">
+                <button class="btn btn-light btn-outline-success" type="button" @onclick="(() => PayOrder(updatedOrder))">Pay order</button>
+            </div>
+            <button class="btn btn-info" type="submit">Update order</button>
+        </EditForm>
+    </div>
 </div>
 
 @code
@@ -84,12 +133,19 @@
     List<Order> orders;
     List<Order> ordersDispatched;
     List<Order> ordersNotDispatched;
+    List<Customer> customers;
+    Customer chosenCustomer;
 
     protected override async Task OnInitializedAsync()
     {
+        await OrderLineRepository.GetAllAsync();
+        await CustomerRepository.GetAllAsync();
         orders = await OrderRepository.GetAllAsync() as List<Order>;
         ordersDispatched = await OrderRepository.GetDispatchedOrdersAsync() as List<Order>;
         ordersNotDispatched = await OrderRepository.GetPendingOrdersAsync() as List<Order>;
+        customers = await CustomerRepository.GetAllAsync() as List<Customer>;
+        newOrder = new Order();
+        chosenCustomer = new Customer();
     }
 
     Order newOrder = new Order();
@@ -97,9 +153,18 @@
 
     private async Task AddOrder(Order order)
     {
+        order.OrderDate = DateTime.Now;
+        order.PaymentCompleted = false;
         await OrderRepository.AddAsync(order);
-        newOrder = new Order();
+        OrderLineCreatorNavigation(newOrder);
         await GuiUpdate();
+
+    }
+
+    private void ChooseCustomer(Customer customer)
+    {
+        newOrder = new Order();
+        newOrder.Customer = customer;
     }
 
     private void SetOrderForUpdates(Order selected)
@@ -113,22 +178,29 @@
         updatedOrder = new Order();
     }
 
+    private async Task PayOrder(Order order)
+    {
+        await OrderRepository.PayOrderAsync(order);
+        await GuiUpdate();
+    }
+
     private async Task DeleteOrder(Order order)
     {
         await OrderRepository.RemoveAsync(order);
         await GuiUpdate();
     }
 
-    private void ProcessOrders()
+    private async Task ProcessOrders()
     {
         foreach (Order order in ordersNotDispatched)
         {
-            if (OrderRepository.ItemsInStockAsync(order).Result)
+            if (order.PaymentCompleted && ProductRepository.ItemInStock(order).Result)
             {
-                ProductRepository.UpdateStockAsync(order);
-                OrderRepository.UpdateDispatchStatusAsync(order);
+                await ProductRepository.UpdateStockAsync(order);
+                await OrderRepository.UpdateDispatchStatusAsync(order);
             }
         }
+        await GuiUpdate();
     }
 
     private async Task GuiUpdate()
@@ -136,10 +208,45 @@
         await OnInitializedAsync();
     }
 
-    private void OrderNavigation()
+    private void OrderLineCreatorNavigation(Order order)
     {
-        NavManager.NavigateTo("/OrderLineCreator");
+        NavManager.NavigateTo($"/OrderLineCreator/{order.Id}");
+    }
 
+    private void OrderedlinesViewNavigation(Order order)
+    {
+        NavManager.NavigateTo($"/OrderedLinesView/{order.Id}");
+    }
+
+    private void OrderlineViewNavigation(Order order)
+    {
+        NavManager.NavigateTo($"/OrderLineView/{order.Id}");
+    }
+
+    private string PaymentStatus(bool status)
+    {
+        if (status == true)
+        {
+            return "Paid";
+        }
+        else return "Not paid";
+    }
+    private string DispatchedStatus(bool dispatched)
+    {
+        if (dispatched == true)
+        {
+            return "Dispatched";
+        }
+        else return "Not dispatched";
+    }
+    private DateTime EarliestDispatch(Order order)
+    {
+
+        if (ProductRepository.ItemInStock(order).Result)
+        {
+            return DateTime.Now;
+        }
+        else return DateTime.Now.AddDays(10);
     }
 }
 

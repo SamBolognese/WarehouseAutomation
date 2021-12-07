@@ -5,11 +5,12 @@
 @inject IProductRepository ProductRepository
 @inject ICustomerRepository CustomerRepository
 @inject IOrderRepository OrderRepository
+@inject NavigationManager NavManager
 
 <h2>Customers</h2>
 <div class="container-fluid">
     <div class="row bg-light">
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th>Id</th>
@@ -28,7 +29,7 @@
                         <td>@customer.Name</td>
                         <td>@customer.Phone</td>
                         <td>@customer.Email</td>
-                        <td><button class="btn btn-outline-info">Show orders</button></td>
+                        <td><button class="btn btn-outline-info" @onclick="(() => OrderViewNavigation(customer))">Show orders</button></td>
                         <td><button class="btn btn-danger" @onclick="(() => DeleteCustomer(customer))">Delete customer</button></td>
                     </tr>
                 }
@@ -36,42 +37,47 @@
         </table>
     </div>
 
-    <EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="name">Customer name</label>
-            <input @bind-value="@newCustomer.Name" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone number</label>
-            <input @bind-value="@newCustomer.Phone" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input @bind-value="@newCustomer.Email" type="text" />
-        </div>
-        <button class="btn btn-info" type="submit">Add customer</button>
-    </EditForm>
-
-    <EditForm Model="@updatedCustomer" OnValidSubmit="(() => UpdateCustomer(updatedCustomer))">
-        <div class="form-group">
-            <label for="name">Customer name</label>
-            <input @bind-value="@updatedCustomer.Name" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="phone">Phone number</label>
-            <input @bind-value="@updatedCustomer.Phone" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="Email">Email</label>
-            <input @bind-value="@updatedCustomer.Email" type="text" />
-        </div>
-        <button class="btn btn-info" type="submit">Update customer</button>
-    </EditForm>
+    <div class='card p-3 bg-light m-2'>
+        <EditForm Model="@newCustomer" OnValidSubmit="(() => AddCustomer(newCustomer))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">Customer name</label>
+                <input @bind-value="@newCustomer.Name" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone number</label>
+                <input @bind-value="@newCustomer.Phone" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input @bind-value="@newCustomer.Email" type="text" />
+            </div>
+            <button class="btn btn-info" type="submit">Add customer</button>
+        </EditForm>
+    </div>
+    <div class='card p-3 bg-light m-2'>
+        <EditForm Model="@updatedCustomer" OnValidSubmit="(() => UpdateCustomer(updatedCustomer))">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">Customer name</label>
+                <input @bind-value="@updatedCustomer.Name" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone number</label>
+                <input @bind-value="@updatedCustomer.Phone" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input @bind-value="@updatedCustomer.Email" type="text" />
+            </div>
+            <button class="btn btn-info" type="submit">Update customer</button>
+        </EditForm>
+    </div>
 </div>
 
-@code 
+@code
 {
     List<Customer> customers;
 
@@ -83,10 +89,11 @@
     Customer newCustomer = new Customer();
     Customer updatedCustomer = new Customer();
 
-    private void AddCustomer(Customer customer)
+    private async Task AddCustomer(Customer customer)
     {
-        CustomerRepository.AddAsync(customer);
+        await CustomerRepository.AddAsync(customer);
         newCustomer = new Customer();
+        await GuiUpdate();
     }
 
     private void SetCustomerForUpdates(Customer selected)
@@ -94,17 +101,23 @@
         updatedCustomer = selected;
     }
 
-    private void UpdateCustomer(Customer customer)
+    private async Task UpdateCustomer(Customer customer)
     {
-        CustomerRepository.UpdateAsync(customer);
+        await CustomerRepository.UpdateAsync(customer);
     }
 
-    private void DeleteCustomer(Customer customer)
+    private async Task DeleteCustomer(Customer customer)
     {
-        CustomerRepository.RemoveAsync(customer);
+        await CustomerRepository.RemoveAsync(customer);
+        await GuiUpdate();
     }
     private async Task GuiUpdate()
     {
         await OnInitializedAsync();
+    }
+
+    private void OrderViewNavigation(Customer customer)
+    {
+        NavManager.NavigateTo($"/OrderView/{customer.Id}");
     }
 }
